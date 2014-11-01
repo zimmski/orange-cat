@@ -9,18 +9,18 @@ import (
 
 type HttpServer struct {
 	port     int
+	template func(*http.ResponseWriter)
 	dataChan <-chan *string
-	server   *http.Server
 }
 
-func NewHttpServer(port int, dataChan <-chan *string) *HttpServer {
-	return &HttpServer{port, dataChan, nil}
+func NewHttpServer(port int, template func(*http.ResponseWriter), dataChan <-chan *string) *HttpServer {
+	return &HttpServer{port, template, dataChan}
 }
 
 func (s *HttpServer) Listen() {
 	portStr := ":" + strconv.Itoa(s.port)
 
-	s.server = &http.Server{
+	server := &http.Server{
 		Addr:           portStr,
 		Handler:        s,
 		ReadTimeout:    10 * time.Second,
@@ -29,7 +29,7 @@ func (s *HttpServer) Listen() {
 	}
 
 	go func() {
-		err := s.server.ListenAndServe()
+		err := server.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}
@@ -43,7 +43,6 @@ func (s *HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// FIXME
 		http.Error(w, "Not yet implemented...", 404)
 	} else {
-		// FIXME
-		w.Write([]byte("Hello, world!"))
+		s.template(&w)
 	}
 }
