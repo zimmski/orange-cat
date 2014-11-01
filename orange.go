@@ -24,8 +24,8 @@ func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath, data)
 	watcher.Start()
 
-	httpServer := NewHttpServer(data)
-	httpServer.Listen(port)
+	httpServer := NewHttpServer(port, data)
+	httpServer.Listen()
 
 	<-done
 

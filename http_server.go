@@ -8,16 +8,17 @@ import (
 )
 
 type HttpServer struct {
+	port     int
 	dataChan <-chan *string
 	server   *http.Server
 }
 
-func NewHttpServer(dataChan <-chan *string) *HttpServer {
-	return &HttpServer{dataChan, nil}
+func NewHttpServer(port int, dataChan <-chan *string) *HttpServer {
+	return &HttpServer{port, dataChan, nil}
 }
 
-func (s *HttpServer) Listen(port int) {
-	portStr := ":" + strconv.Itoa(port)
+func (s *HttpServer) Listen() {
+	portStr := ":" + strconv.Itoa(s.port)
 
 	s.server = &http.Server{
 		Addr:           portStr,
