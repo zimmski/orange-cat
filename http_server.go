@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -13,20 +12,18 @@ const (
 )
 
 type HttpServer struct {
-	port     int
+	port     string
 	template func(*http.ResponseWriter)
 	dataChan <-chan *string
 }
 
-func NewHttpServer(port int, template func(*http.ResponseWriter), dataChan <-chan *string) *HttpServer {
+func NewHttpServer(port string, template func(*http.ResponseWriter), dataChan <-chan *string) *HttpServer {
 	return &HttpServer{port, template, dataChan}
 }
 
 func (s *HttpServer) Listen() {
-	portStr := ":" + strconv.Itoa(s.port)
-
 	server := &http.Server{
-		Addr:           portStr,
+		Addr:           s.port,
 		Handler:        s,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -46,7 +43,7 @@ func (s *HttpServer) Listen() {
 		ticker := time.NewTicker(time.Millisecond * ListeningTestInterval)
 		for i := 0; i < MaxListeningTestCount; i++ {
 			<-ticker.C
-			resp, err := http.Get("http://localhost" + portStr + "/ping")
+			resp, err := http.Get("http://localhost" + s.port + "/ping")
 			if err == nil && resp.StatusCode == 200 {
 				result = true
 				break
@@ -57,7 +54,7 @@ func (s *HttpServer) Listen() {
 	}()
 
 	if <-isListening {
-		fmt.Println("Listening", portStr, "...")
+		fmt.Println("Listening", s.port, "...")
 	} else {
 		panic("Can't connect to server")
 	}

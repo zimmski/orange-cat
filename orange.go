@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strconv"
+)
+
 const (
 	DataChanSize = 3
 )
@@ -18,13 +22,15 @@ func (o *Orange) UseBasic() {
 }
 
 func (o *Orange) Run(port int) {
+	portStr := ":" + strconv.Itoa(port)
+
 	done := make(chan bool)
 	data := make(chan *string, DataChanSize)
 
 	watcher := NewWatcher(o.filepath, data)
 	watcher.Start()
 
-	httpServer := NewHttpServer(port, Template(o.filepath, port), data)
+	httpServer := NewHttpServer(portStr, Template(o.filepath, port), data)
 	httpServer.Listen()
 
 	<-done
