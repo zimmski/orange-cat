@@ -6,8 +6,7 @@ import (
 )
 
 const (
-	WatcherInterval = 500
-	DataChanSize    = 3
+	DataChanSize = 3
 )
 
 func NewOrange(filepath string) *Orange {

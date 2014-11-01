@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	WatcherInterval = 500
+)
+
 type Watcher struct {
 	filepath string
 	dataChan chan<- *string
