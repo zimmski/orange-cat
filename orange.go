@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
 const (
 	DataChanSize = 3
 )
@@ -29,15 +24,8 @@ func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath, data)
 	watcher.Start()
 
-	temp := time.NewTicker(time.Millisecond * WatcherInterval)
-	go func() {
-		for {
-			<-temp.C
-
-			str := <-data
-			fmt.Println("new data!", *str)
-		}
-	}()
+	httpServer := NewHttpServer(data)
+	httpServer.Listen(port)
 
 	<-done
 
