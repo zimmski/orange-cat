@@ -30,9 +30,7 @@ func (w *Watcher) Start() {
 			select {
 			case <-w.done:
 				return
-			default:
-				<-w.ticker.C
-
+			case <-w.ticker.C:
 				info, err := os.Stat(w.filepath)
 				if err != nil {
 					continue
