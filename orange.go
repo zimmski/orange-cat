@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/skratchdot/open-golang/open"
 	"strconv"
 )
 
@@ -32,6 +33,8 @@ func (o *Orange) Run(port int) {
 
 	httpServer := NewHttpServer(portStr, Template(o.filepath, port), data)
 	httpServer.Listen()
+
+	open.Run("http://localhost" + portStr)
 
 	<-done
 
