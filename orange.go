@@ -2,7 +2,12 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"time"
+)
+
+const (
+	WatcherInterval = 500
+	DataChanSize    = 3
 )
 
 func NewOrange(filepath string) *Orange {
@@ -19,6 +24,23 @@ func (o *Orange) UseBasic() {
 }
 
 func (o *Orange) Run(port int) {
-	portString := ":" + strconv.Itoa(port)
-	fmt.Println(portString)
+	done := make(chan bool)
+	data := make(chan *string, DataChanSize)
+
+	watcher := NewWatcher(o.filepath, data)
+	watcher.Start()
+
+	temp := time.NewTicker(time.Millisecond * WatcherInterval)
+	go func() {
+		for {
+			<-temp.C
+
+			str := <-data
+			fmt.Println("new data!", *str)
+		}
+	}()
+
+	<-done
+
+	watcher.Stop()
 }
