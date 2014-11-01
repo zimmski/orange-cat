@@ -14,11 +14,11 @@ const (
 type HttpServer struct {
 	port     string
 	template func(*http.ResponseWriter)
-	dataChan <-chan *string
+	ws       *Websocket
 }
 
 func NewHttpServer(port string, template func(*http.ResponseWriter), dataChan <-chan *string) *HttpServer {
-	return &HttpServer{port, template, dataChan}
+	return &HttpServer{port, template, NewWebsocket(dataChan)}
 }
 
 func (s *HttpServer) Listen() {
@@ -64,8 +64,7 @@ func (s *HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/ping" {
 		w.Write([]byte("pong"))
 	} else if r.URL.Path == "/ws" {
-		// FIXME
-		http.Error(w, "Not yet implemented...", 404)
+		s.ws.Serve(&w, r)
 	} else {
 		s.template(&w)
 	}
