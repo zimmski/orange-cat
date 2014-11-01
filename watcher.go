@@ -12,13 +12,13 @@ const (
 
 type Watcher struct {
 	filepath string
-	dataChan chan<- *string
+	markdown chan<- *string
 	ticker   *time.Ticker
 	done     chan bool
 }
 
-func NewWatcher(filepath string, dataChan chan<- *string) *Watcher {
-	return &Watcher{filepath, dataChan, nil, nil}
+func NewWatcher(filepath string, markdown chan<- *string) *Watcher {
+	return &Watcher{filepath, markdown, nil, nil}
 }
 
 func (w *Watcher) Start() {
@@ -46,7 +46,7 @@ func (w *Watcher) Start() {
 					}
 
 					data := string(raw)
-					w.dataChan <- &data
+					w.markdown <- &data
 				}
 			}
 		}

@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DataChanSize = 3
+	MarkdownChanSize = 3
 )
 
 func NewOrange(filepath string) *Orange {
@@ -26,12 +26,12 @@ func (o *Orange) Run(port int) {
 	portStr := ":" + strconv.Itoa(port)
 
 	done := make(chan bool)
-	data := make(chan *string, DataChanSize)
+	markdown := make(chan *string, MarkdownChanSize)
 
-	watcher := NewWatcher(o.filepath, data)
+	watcher := NewWatcher(o.filepath, markdown)
 	watcher.Start()
 
-	httpServer := NewHttpServer(portStr, Template(o.filepath, port), data)
+	httpServer := NewHttpServer(portStr, Template(o.filepath, port), markdown)
 	httpServer.Listen()
 
 	open.Run("http://localhost" + portStr)
