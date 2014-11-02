@@ -30,8 +30,10 @@ func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath)
 	watcher.Start()
 
-	dataChan := watcher.GetDataChan()
-	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), dataChan)
+	mdConverter := NewMdConverter(watcher.GetDataChan(), o.useBasic)
+
+	mdChan := mdConverter.GetMdChan()
+	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), mdChan)
 	httpServer.Listen()
 
 	open.Run("http://localhost" + portStr)

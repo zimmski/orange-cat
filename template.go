@@ -727,9 +727,7 @@ func Template(filepath string, port int) func(*http.ResponseWriter) {
       var markdown = document.getElementById("md");
       var conn = new WebSocket("ws://localhost:%[2]d/ws");
       conn.onmessage = function (evt) {
-        // FIXME
-        // markdown.innerHTML = evt.data;
-        markdown.innerText = evt.data;
+        markdown.innerHTML = evt.data;
       };
     })();
   </script>
