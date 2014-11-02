@@ -11,17 +11,17 @@ const (
 	MaxListeningTestCount = 10
 )
 
-type HttpServer struct {
+type HTTPServer struct {
 	port     string
 	template func(*http.ResponseWriter)
 	ws       *Websocket
 }
 
-func NewHttpServer(port string, template func(*http.ResponseWriter), markdown <-chan *string) *HttpServer {
-	return &HttpServer{port, template, NewWebsocket(markdown)}
+func NewHTTPServer(port string, template func(*http.ResponseWriter), markdown <-chan *string) *HTTPServer {
+	return &HTTPServer{port, template, NewWebsocket(markdown)}
 }
 
-func (s *HttpServer) Listen() {
+func (s *HTTPServer) Listen() {
 	server := &http.Server{
 		Addr:           s.port,
 		Handler:        s,
@@ -60,7 +60,7 @@ func (s *HttpServer) Listen() {
 	}
 }
 
-func (s *HttpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/ping" {
 		w.Write([]byte("pong"))
 	} else if r.URL.Path == "/ws" {

@@ -31,7 +31,7 @@ func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath, markdown)
 	watcher.Start()
 
-	httpServer := NewHttpServer(portStr, Template(o.filepath, port), markdown)
+	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), markdown)
 	httpServer.Listen()
 
 	open.Run("http://localhost" + portStr)
