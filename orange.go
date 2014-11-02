@@ -30,9 +30,8 @@ func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath)
 	watcher.Start()
 
-	mdConverter := NewMdConverter(watcher.GetDataChan(), o.useBasic)
+	mdChan := NewMdChan(watcher.GetDataChan(), o.useBasic)
 
-	mdChan := mdConverter.GetMdChan()
 	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), mdChan)
 	httpServer.Listen()
 
