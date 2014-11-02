@@ -26,12 +26,12 @@ func (o *Orange) Run(port int) {
 	portStr := ":" + strconv.Itoa(port)
 
 	done := make(chan bool)
-	markdown := make(chan *string, MarkdownChanSize)
 
-	watcher := NewWatcher(o.filepath, markdown)
+	watcher := NewWatcher(o.filepath)
 	watcher.Start()
 
-	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), markdown)
+	dataChan := watcher.GetDataChan()
+	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), dataChan)
 	httpServer.Listen()
 
 	open.Run("http://localhost" + portStr)

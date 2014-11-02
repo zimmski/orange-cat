@@ -18,11 +18,11 @@ var upgrader = goWs.Upgrader{
 }
 
 type Websocket struct {
-	markdown <-chan *string
+	dataChan *DataChan
 }
 
-func NewWebsocket(markdown <-chan *string) *Websocket {
-	return &Websocket{markdown}
+func NewWebsocket(dataChan *DataChan) *Websocket {
+	return &Websocket{dataChan}
 }
 
 func (ws *Websocket) Reader(c *goWs.Conn, closed chan<- bool) {
@@ -40,7 +40,7 @@ func (ws *Websocket) Writer(c *goWs.Conn, closed <-chan bool) {
 	defer c.Close()
 	for {
 		select {
-		case data := <-ws.markdown:
+		case data := <-ws.dataChan.data:
 			c.SetWriteDeadline(time.Now().Add(WriteTimeout))
 			// FIXME: Markdown convert
 			err := c.WriteMessage(goWs.TextMessage, []byte(*data))
@@ -67,6 +67,7 @@ func (ws *Websocket) Serve(w *http.ResponseWriter, r *http.Request) {
 
 	closed := make(chan bool)
 
+	ws.dataChan.request <- true
 	go ws.Reader(sock, closed)
 	ws.Writer(sock, closed)
 }

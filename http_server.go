@@ -17,8 +17,8 @@ type HTTPServer struct {
 	ws       *Websocket
 }
 
-func NewHTTPServer(port string, template func(*http.ResponseWriter), markdown <-chan *string) *HTTPServer {
-	return &HTTPServer{port, template, NewWebsocket(markdown)}
+func NewHTTPServer(port string, template func(*http.ResponseWriter), dataChan *DataChan) *HTTPServer {
+	return &HTTPServer{port, template, NewWebsocket(dataChan)}
 }
 
 func (s *HTTPServer) Listen() {
