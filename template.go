@@ -716,6 +716,7 @@ func Template(filepath string, port int) func(*http.ResponseWriter) {
     /* custom style */
     .markdown-body {
       max-width: 800px;
+      margin: 0 auto;
     }
   </style>
 </head>
@@ -726,7 +727,9 @@ func Template(filepath string, port int) func(*http.ResponseWriter) {
       var markdown = document.getElementById("md");
       var conn = new WebSocket("ws://localhost:%[2]d/ws");
       conn.onmessage = function (evt) {
-        data.innerHTML = evt.data;
+        // FIXME
+        // markdown.innerHTML = evt.data;
+        markdown.innerText = evt.data;
       };
     })();
   </script>
