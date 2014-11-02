@@ -6,7 +6,7 @@ WARN_COLOR="\033[33;01m"
 
 files_to_fmt=`gofmt -l .`
 
-if [[ -n "$files_to_fmt" ]]; then
+if [ -n "$files_to_fmt" ]; then
   echo $ERROR_COLOR"Following files haven't yet been gofmt'ed."$NO_COLOR"\n"
   for file in $files_to_fmt; do
     echo "  "$file
