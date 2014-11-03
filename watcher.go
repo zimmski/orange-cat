@@ -12,7 +12,7 @@ const (
 )
 
 type DataChan struct {
-	data    chan *string
+	raw     chan *[]byte
 	request chan bool
 }
 
@@ -24,7 +24,7 @@ type Watcher struct {
 }
 
 func NewWatcher(filepath string) *Watcher {
-	dataChan := DataChan{make(chan *string, DataChanSize), make(chan bool)}
+	dataChan := DataChan{make(chan *[]byte, DataChanSize), make(chan bool)}
 	return &Watcher{filepath, &dataChan, nil, nil}
 }
 
@@ -59,8 +59,7 @@ func (w *Watcher) Start() {
 						continue
 					}
 
-					data := string(raw)
-					w.dataChan.data <- &data
+					w.dataChan.raw <- &raw
 				}
 			}
 		}

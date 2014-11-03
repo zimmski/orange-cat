@@ -42,7 +42,7 @@ func (ws *Websocket) Writer(c *goWs.Conn, closed <-chan bool) {
 		select {
 		case data := <-ws.mdChan.data:
 			c.SetWriteDeadline(time.Now().Add(WriteTimeout))
-			err := c.WriteMessage(goWs.TextMessage, []byte(*data))
+			err := c.WriteMessage(goWs.TextMessage, *data)
 			if err != nil {
 				return
 			}

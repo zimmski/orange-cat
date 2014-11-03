@@ -5,11 +5,11 @@ import (
 )
 
 type MdChan struct {
-	data    chan *string
+	data    chan *[]byte
 	request chan bool
 }
 
-func (md *MdChan) MarkdownConverter(rawDataChan chan *string, useBasic bool) {
+func (md *MdChan) MarkdownConverter(rawDataChan chan *[]byte, useBasic bool) {
 	var convert func([]byte) []byte
 	if useBasic {
 		convert = blackfriday.MarkdownBasic
@@ -19,8 +19,8 @@ func (md *MdChan) MarkdownConverter(rawDataChan chan *string, useBasic bool) {
 
 	for {
 		select {
-		case rawData := <-rawDataChan:
-			data := string(convert([]byte(*rawData)))
+		case raw := <-rawDataChan:
+			data := convert(*raw)
 			md.data <- &data
 		default:
 		}
@@ -28,9 +28,9 @@ func (md *MdChan) MarkdownConverter(rawDataChan chan *string, useBasic bool) {
 }
 
 func NewMdChan(watcherDataChan *DataChan, useBasic bool) *MdChan {
-	mdChan := MdChan{make(chan *string), watcherDataChan.request}
+	mdChan := MdChan{make(chan *[]byte), watcherDataChan.request}
 
-	go mdChan.MarkdownConverter(watcherDataChan.data, useBasic)
+	go mdChan.MarkdownConverter(watcherDataChan.raw, useBasic)
 
 	return &mdChan
 }
