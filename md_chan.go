@@ -5,8 +5,8 @@ import (
 )
 
 type MdChan struct {
-	data    chan *[]byte
-	request chan bool
+	Data    chan *[]byte
+	Request chan bool
 	stop    chan bool
 }
 
@@ -24,7 +24,7 @@ func (md *MdChan) MarkdownConverter(rawDataChan chan *[]byte, useBasic bool) {
 		select {
 		case raw := <-rawDataChan:
 			data := convert(*raw)
-			md.data <- &data
+			md.Data <- &data
 		case <-md.stop:
 			return
 		default:
@@ -37,9 +37,9 @@ func (md *MdChan) Stop() {
 }
 
 func NewMdChan(watcherDataChan *DataChan, useBasic bool) *MdChan {
-	mdChan := MdChan{make(chan *[]byte), watcherDataChan.request, nil}
+	mdChan := MdChan{make(chan *[]byte), watcherDataChan.Request, nil}
 
-	go mdChan.MarkdownConverter(watcherDataChan.raw, useBasic)
+	go mdChan.MarkdownConverter(watcherDataChan.Raw, useBasic)
 
 	return &mdChan
 }

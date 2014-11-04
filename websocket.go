@@ -40,7 +40,7 @@ func (ws *Websocket) Writer(c *goWs.Conn, closed <-chan bool) {
 	defer c.Close()
 	for {
 		select {
-		case data := <-ws.mdChan.data:
+		case data := <-ws.mdChan.Data:
 			c.SetWriteDeadline(time.Now().Add(WriteTimeout))
 			err := c.WriteMessage(goWs.TextMessage, *data)
 			if err != nil {
@@ -66,7 +66,7 @@ func (ws *Websocket) Serve(w *http.ResponseWriter, r *http.Request) {
 
 	closed := make(chan bool)
 
-	ws.mdChan.request <- true
+	ws.mdChan.Request <- true
 	go ws.Reader(sock, closed)
 	ws.Writer(sock, closed)
 }

@@ -12,8 +12,8 @@ const (
 )
 
 type DataChan struct {
-	raw     chan *[]byte
-	request chan bool
+	Raw     chan *[]byte
+	Request chan bool
 }
 
 type Watcher struct {
@@ -41,7 +41,7 @@ func (w *Watcher) Start() {
 			case <-w.ticker.C:
 				var reload bool = false
 				select {
-				case <-w.dataChan.request:
+				case <-w.dataChan.Request:
 					reload = true
 				default:
 				}
@@ -60,7 +60,7 @@ func (w *Watcher) Start() {
 						continue
 					}
 
-					w.dataChan.raw <- &raw
+					w.dataChan.Raw <- &raw
 				}
 			}
 		}
