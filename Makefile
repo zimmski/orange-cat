@@ -37,8 +37,7 @@ fmt:
 testdeps:
 	@echo "$(OK_COLOR)==> Installing test dependencies$(NO_COLOR)"
 	@- $(foreach DEP, $(TEST_DEPS), \
-		echo $(DEP)" (download)"; \
-		go get $(DEP); \
+		go get -d -v $(DEP); \
 	)
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
