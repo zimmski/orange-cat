@@ -8,7 +8,7 @@ TEST_DEPS = \
 	github.com/onsi/gomega
 TEST_DIR = 'tests'
 
-all: fmt testdeps test deps build
+all: fmt deps testdeps test build
 
 deps:
 	@echo "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
