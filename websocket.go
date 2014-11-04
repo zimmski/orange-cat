@@ -52,13 +52,13 @@ func (ws *Websocket) Writer(c *goWs.Conn, closed <-chan bool) {
 	}
 }
 
-func (ws *Websocket) Serve(w *http.ResponseWriter, r *http.Request) {
+func (ws *Websocket) Serve(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		http.Error(*w, "Method not allowed", 405)
+		http.Error(w, "Method not allowed", 405)
 		return
 	}
 
-	sock, err := upgrader.Upgrade(*w, r, nil)
+	sock, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Can't connect to websocket")
 		return

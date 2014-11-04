@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-func Template(filepath string, port int) func(*http.ResponseWriter) {
+func Template(filepath string, port int) func(http.ResponseWriter) {
 	templateStr := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -404,8 +404,8 @@ func Template(filepath string, port int) func(*http.ResponseWriter) {
 		panic(err)
 	}
 
-	return func(w *http.ResponseWriter) {
-		err := template.Execute(*w, nil)
+	return func(w http.ResponseWriter) {
+		err := template.Execute(w, nil)
 		if err != nil {
 			panic(err)
 		}
