@@ -29,10 +29,10 @@ func NewWatcher(filepath string) *Watcher {
 }
 
 func (w *Watcher) Start() {
-	w.ticker = time.NewTicker(time.Millisecond * WatcherInterval)
-	defer w.ticker.Stop()
-	w.stop = make(chan bool)
 	go func() {
+		w.ticker = time.NewTicker(time.Millisecond * WatcherInterval)
+		defer w.ticker.Stop()
+		w.stop = make(chan bool)
 		var currentTimestamp int64 = 0
 		for {
 			select {
