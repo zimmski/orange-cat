@@ -20,7 +20,7 @@ type Watcher struct {
 	filepath string
 	dataChan *DataChan
 	ticker   *time.Ticker
-	done     chan bool
+	stop     chan bool
 }
 
 func NewWatcher(filepath string) *Watcher {
@@ -30,12 +30,13 @@ func NewWatcher(filepath string) *Watcher {
 
 func (w *Watcher) Start() {
 	w.ticker = time.NewTicker(time.Millisecond * WatcherInterval)
-	w.done = make(chan bool)
+	defer w.ticker.Stop()
+	w.stop = make(chan bool)
 	go func() {
 		var currentTimestamp int64 = 0
 		for {
 			select {
-			case <-w.done:
+			case <-w.stop:
 				return
 			case <-w.ticker.C:
 				var reload bool = false
@@ -67,8 +68,7 @@ func (w *Watcher) Start() {
 }
 
 func (w *Watcher) Stop() {
-	w.done <- true
-	w.ticker.Stop()
+	w.stop <- true
 }
 
 func (w *Watcher) GetDataChan() *DataChan {

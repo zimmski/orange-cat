@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 )
@@ -15,13 +16,15 @@ type HTTPServer struct {
 	port     string
 	template func(*http.ResponseWriter)
 	ws       *Websocket
+	listener net.Listener
 }
 
 func NewHTTPServer(port string, template func(*http.ResponseWriter), mdChan *MdChan) *HTTPServer {
-	return &HTTPServer{port, template, NewWebsocket(mdChan)}
+	return &HTTPServer{port, template, NewWebsocket(mdChan), nil}
 }
 
-func (s *HTTPServer) Listen() {
+func (s *HTTPServer) ListenAndServe() {
+	var err error
 	server := &http.Server{
 		Addr:           s.port,
 		Handler:        s,
@@ -30,12 +33,16 @@ func (s *HTTPServer) Listen() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	go func() {
-		err := server.ListenAndServe()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	s.listener, err = net.Listen("tcp", s.port)
+	if err != nil {
+		panic(err)
+	}
+
+	server.Serve(s.listener)
+}
+
+func (s *HTTPServer) Listen() {
+	go s.ListenAndServe()
 
 	isListening := make(chan bool)
 	go func() {
@@ -68,4 +75,8 @@ func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		s.template(&w)
 	}
+}
+
+func (s *HTTPServer) Stop() {
+	s.listener.Close()
 }
