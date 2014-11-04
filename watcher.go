@@ -23,9 +23,12 @@ type Watcher struct {
 	stop     chan bool
 }
 
+func NewDataChan() *DataChan {
+	return &DataChan{make(chan *[]byte, DataChanSize), make(chan bool)}
+}
+
 func NewWatcher(filepath string) *Watcher {
-	dataChan := DataChan{make(chan *[]byte, DataChanSize), make(chan bool)}
-	return &Watcher{filepath, &dataChan, nil, nil}
+	return &Watcher{filepath, NewDataChan(), nil, nil}
 }
 
 func (w *Watcher) Start() {
