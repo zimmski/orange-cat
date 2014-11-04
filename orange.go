@@ -10,7 +10,7 @@ const (
 )
 
 func NewOrange(filepath string) *Orange {
-	return &Orange{filepath, false, nil}
+	return &Orange{filepath, false, make(chan bool)}
 }
 
 type Orange struct {
@@ -25,8 +25,6 @@ func (o *Orange) UseBasic() {
 
 func (o *Orange) Run(port int) {
 	portStr := ":" + strconv.Itoa(port)
-
-	o.stop = make(chan bool)
 
 	watcher := NewWatcher(o.filepath)
 	watcher.Start()

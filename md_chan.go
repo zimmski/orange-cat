@@ -11,8 +11,6 @@ type MdChan struct {
 }
 
 func (md *MdChan) MarkdownConverter(rawDataChan chan *[]byte, useBasic bool) {
-	md.stop = make(chan bool)
-
 	var convert func([]byte) []byte
 	if useBasic {
 		convert = blackfriday.MarkdownBasic
@@ -37,7 +35,7 @@ func (md *MdChan) Stop() {
 }
 
 func NewMdChan(watcherDataChan *DataChan, useBasic bool) *MdChan {
-	mdChan := MdChan{make(chan *[]byte), watcherDataChan.Request, nil}
+	mdChan := MdChan{make(chan *[]byte), watcherDataChan.Request, make(chan bool)}
 
 	go mdChan.MarkdownConverter(watcherDataChan.Raw, useBasic)
 
