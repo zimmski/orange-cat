@@ -27,3 +27,10 @@ checkfmt:
 	@echo "$(OK_COLOR)==> Checking if there's any file to fmt$(NO_COLOR)"
 	@scripts/gofmt.sh
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
+
+testdeps:
+	go get github.com/onsi/ginkgo
+	go get github.com/onsi/gomega
+
+test: testdeps
+	go test
