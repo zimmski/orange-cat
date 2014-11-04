@@ -38,5 +38,5 @@ testdeps:
 test: testdeps
 	@echo "$(OK_COLOR)==> Testing modules$(NO_COLOR)"
 	@cd $(TEST_DIR) && \
-		go test
+		go test -ginkgo.v
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
