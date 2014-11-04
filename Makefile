@@ -3,6 +3,9 @@ OK_COLOR=\033[32;01m
 ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
 DEPS = $(go list -f '{{range .TestImports}}{{.}} {{end}}' ./...)
+TEST_DEPS = \
+	github.com/onsi/ginkgo \
+	github.com/onsi/gomega
 TEST_DIR = 'tests'
 
 all: fmt testdeps test deps build
@@ -32,8 +35,12 @@ fmt:
 	fi
 
 testdeps:
-	@go get github.com/onsi/ginkgo
-	@go get github.com/onsi/gomega
+	@echo "$(OK_COLOR)==> Installing test dependencies$(NO_COLOR)"
+	@- $(foreach DEP, $(TEST_DEPS), \
+		echo $(DEP)" (download)"; \
+		go get $(DEP); \
+	)
+	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
 test: testdeps
 	@echo "$(OK_COLOR)==> Testing modules$(NO_COLOR)"
