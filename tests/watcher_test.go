@@ -35,18 +35,18 @@ var _ = Describe("Watcher", func() {
 	Describe("#NewWatcher()", func() {
 		It("should return a new Watcher object.", func() {
 			watcher := NewWatcher(testFilepath)
-			Expect(watcher).NotTo(Equal(nil))
+			Expect(watcher).NotTo(BeNil())
 		})
 	})
 
-	Describe("#GetDataChan()", func() {
+	Describe("#watcher.GetDataChan()", func() {
 		It("should return a DataChan object.", func() {
 			watcher := NewWatcher(testFilepath)
-			Expect(watcher.GetDataChan()).NotTo(Equal(nil))
+			Expect(watcher.GetDataChan()).NotTo(BeNil())
 		})
 	})
 
-	Describe("#Start()", func() {
+	Describe("#watcher.Start()", func() {
 		It("should start watching the file modification.", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()
@@ -84,7 +84,7 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
-	Describe("#Stop()", func() {
+	Describe("#watcher.Stop()", func() {
 		It("should stop watching.", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()

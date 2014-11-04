@@ -15,7 +15,7 @@ var _ = Describe("Orange", func() {
 	Describe("#NewOrange()", func() {
 		It("should return a new Orange object.", func() {
 			orange := NewOrange("some_file")
-			Expect(orange).NotTo(Equal(nil))
+			Expect(orange).NotTo(BeNil())
 		})
 	})
 
@@ -53,7 +53,7 @@ var _ = Describe("Orange", func() {
 		It("should stop the orange server running.", func() {
 			orange.Stop()
 			_, err := http.Get("http://localhost:" + strconv.Itoa(port) + "/ping")
-			Expect(err).NotTo(Equal(nil))
+			Expect(err).NotTo(BeNil())
 		})
 
 		It("should be able to stop the server several times.", func() {
@@ -62,7 +62,7 @@ var _ = Describe("Orange", func() {
 			Expect(result).To(Equal(true))
 			orange.Stop()
 			_, err := http.Get("http://localhost:" + strconv.Itoa(port) + "/ping")
-			Expect(err).NotTo(Equal(nil))
+			Expect(err).NotTo(BeNil())
 		})
 	})
 })
