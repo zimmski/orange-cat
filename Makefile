@@ -7,8 +7,9 @@ TEST_DEPS = \
 	github.com/onsi/ginkgo \
 	github.com/onsi/gomega
 TEST_DIR = 'tests'
+XC_ARCH = "darwin/amd64 darwin/386 linux/amd64 linux/386 windows/amd64 windows/386"
 
-all: fmt deps testdeps test build
+all: fmt deps testdeps test xctoolchain xc
 
 deps:
 	@echo "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
@@ -24,7 +25,7 @@ updatedeps:
 
 build: deps
 	@echo "$(OK_COLOR)==> Building orange-cat$(NO_COLOR)"
-	@go build -o orange
+	@go build -o out/orange
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
 fmt:
@@ -45,4 +46,19 @@ test: testdeps
 	@echo "$(OK_COLOR)==> Testing modules$(NO_COLOR)"
 	@cd $(TEST_DIR) && \
 		go test -ginkgo.v
+	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
+
+xctoolchain:
+	@gox -osarch=$(XC_ARCH) -build-toolchain
+
+xc: deps
+	@echo "$(OK_COLOR)==> Compiling into multiple targets$(NO_COLOR)"
+	@go get github.com/mitchellh/gox
+	@gox -osarch=$(XC_ARCH) -output="./out/{{.OS}}_{{.Arch}}/orange"
+	@scripts/zip_output.sh
+	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
+
+clean:
+	@echo "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
+	@rm -rf ./out
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"

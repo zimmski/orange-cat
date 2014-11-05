@@ -5,3 +5,19 @@ go:
   - tip
 
 script: make
+deploy:
+  provider: releases
+  api_key:
+    secure: rTAPyC31s8kmk6jtD5vBkqKv29gEHDG+1zll1RJVvPs6C48mNxjh6Za2XqydrB8wQ0aT0R1GbGCt8Ab+tFUrX+uSqDzdDeAhCo8+ezz1Pz3xdKBdOpr/suXi9yDiXNUhxw/ozGD0PMUnDDp2x5d2QwTi5qQk7vzVkZQCJM3ZzW4=
+  file:
+    -out/orange_darwin_386.zip
+    -out/orange_darwin_amd64.zip
+    -out/orange_linux_386.zip
+    -out/orange_linux_amd64.zip
+    -out/orange_windows_386.zip
+    -out/orange_windows_amd64.zip
+  on:
+    repo: noraesae/orange-cat
+    all_branches: true
+    tags: true
+    go: 1.3

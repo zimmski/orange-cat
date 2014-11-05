@@ -25,3 +25,6 @@ _testmain.go
 
 # OS X
 .DS_Store
+
+# output
+/out
