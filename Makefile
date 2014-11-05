@@ -9,7 +9,7 @@ TEST_DEPS = \
 TEST_DIR = 'tests'
 XC_ARCH = "darwin/amd64 darwin/386 linux/amd64 linux/386 windows/amd64 windows/386"
 
-all: fmt deps testdeps test xctoolchain xc
+all: fmt test xctoolchain xc
 
 deps:
 	@echo "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
@@ -42,16 +42,19 @@ testdeps:
 	)
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
-test: testdeps
+test: testdeps deps
 	@echo "$(OK_COLOR)==> Testing modules$(NO_COLOR)"
 	@cd $(TEST_DIR) && \
 		go test -ginkgo.v
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
-xctoolchain:
+gox:
+	@go get github.com/mitchellh/gox
+
+xctoolchain: gox
 	@gox -osarch=$(XC_ARCH) -build-toolchain
 
-xc: deps
+xc: deps gox
 	@echo "$(OK_COLOR)==> Compiling into multiple targets$(NO_COLOR)"
 	@go get github.com/mitchellh/gox
 	@gox -osarch=$(XC_ARCH) -output="./out/{{.OS}}_{{.Arch}}/orange"
