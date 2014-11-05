@@ -5,9 +5,12 @@ import (
 	"os"
 )
 
+const Version = "0.0.0-dev"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "orange"
+	app.Version = Version
 	app.Usage = `orange-cat is a Markdown previewer written in Go.
    Its main goal is to be used with any editor you love.
    For information, please visit https://github.com/noraesae/orange-cat`
