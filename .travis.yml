@@ -16,4 +16,3 @@ deploy:
     repo: noraesae/orange-cat
     all_branches: true
     tags: true
-    go: 1.3
