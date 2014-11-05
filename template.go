@@ -383,6 +383,13 @@ func Template(filepath string, port int) func(http.ResponseWriter) {
       max-width: 800px;
       margin: 0 auto;
     }
+    a, a:visited {
+      color: #4183c4;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
