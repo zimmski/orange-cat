@@ -15,7 +15,7 @@ GitHub is always right and I had to obey it.
 
 ## Demo
 
-TBD
+![demo](http://i.imgur.com/qETC9A4.gif)
 
 ## Install
 
