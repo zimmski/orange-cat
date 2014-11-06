@@ -9,13 +9,13 @@ const (
 )
 
 func NewOrange(filepath string) *Orange {
-	return &Orange{filepath, false, make(chan bool)}
+	return &Orange{filepath, false, make(chan chan<- bool)}
 }
 
 type Orange struct {
 	filepath string
 	useBasic bool
-	stop     chan bool
+	stop     chan chan<- bool
 }
 
 func (o *Orange) UseBasic() {
@@ -25,20 +25,25 @@ func (o *Orange) UseBasic() {
 func (o *Orange) Run(port int) {
 	watcher := NewWatcher(o.filepath)
 	watcher.Start()
-	defer watcher.Stop()
 
 	mdChan := NewMdChan(watcher.GetDataChan(), o.useBasic)
-	defer mdChan.Stop()
 
 	httpServer := NewHTTPServer(o.filepath, port, mdChan)
 	httpServer.Listen()
-	defer httpServer.Stop()
 
 	open.Run("http://localhost" + httpServer.PortStr())
 
-	<-o.stop
+	done := <-o.stop
+
+	httpServer.Stop()
+	mdChan.Stop()
+	watcher.Stop()
+
+	done <- true
 }
 
 func (o *Orange) Stop() {
-	o.stop <- true
+	done := make(chan bool)
+	o.stop <- done
+	<-done
 }
