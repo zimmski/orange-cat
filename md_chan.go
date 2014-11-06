@@ -25,7 +25,6 @@ func (md *MdChan) MarkdownConverter(rawDataChan chan *[]byte, useBasic bool) {
 			md.Data <- &data
 		case <-md.stop:
 			return
-		default:
 		}
 	}
 }
