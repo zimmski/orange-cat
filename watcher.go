@@ -12,23 +12,20 @@ const (
 )
 
 type DataChan struct {
-	Raw     chan *[]byte
-	Request chan bool
+	Raw chan *[]byte
+	Req chan bool
 }
 
 type Watcher struct {
-	filepath string
-	dataChan *DataChan
-	ticker   *time.Ticker
-	stop     chan bool
+	path   string
+	ticker *time.Ticker
+	stop   chan bool
+	C      *DataChan
 }
 
-func NewDataChan() *DataChan {
-	return &DataChan{make(chan *[]byte, DataChanSize), make(chan bool)}
-}
-
-func NewWatcher(filepath string) *Watcher {
-	return &Watcher{filepath, NewDataChan(), nil, nil}
+func NewWatcher(path string) *Watcher {
+	dataChan := DataChan{make(chan *[]byte, DataChanSize), make(chan bool)}
+	return &Watcher{path, nil, nil, &dataChan}
 }
 
 func (w *Watcher) Start() {
@@ -44,12 +41,12 @@ func (w *Watcher) Start() {
 			case <-w.ticker.C:
 				var reload bool = false
 				select {
-				case <-w.dataChan.Request:
+				case <-w.C.Req:
 					reload = true
 				default:
 				}
 
-				info, err := os.Stat(w.filepath)
+				info, err := os.Stat(w.path)
 				if err != nil {
 					continue
 				}
@@ -58,12 +55,12 @@ func (w *Watcher) Start() {
 				if currentTimestamp < timestamp || reload {
 					currentTimestamp = timestamp
 
-					raw, err := ioutil.ReadFile(w.filepath)
+					raw, err := ioutil.ReadFile(w.path)
 					if err != nil {
 						continue
 					}
 
-					w.dataChan.Raw <- &raw
+					w.C.Raw <- &raw
 				}
 			}
 		}
@@ -72,8 +69,4 @@ func (w *Watcher) Start() {
 
 func (w *Watcher) Stop() {
 	w.stop <- true
-}
-
-func (w *Watcher) GetDataChan() *DataChan {
-	return w.dataChan
 }

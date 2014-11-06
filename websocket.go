@@ -18,11 +18,11 @@ var upgrader = goWs.Upgrader{
 }
 
 type Websocket struct {
-	mdChan *MdChan
+	watcher *Watcher
 }
 
-func NewWebsocket(mdChan *MdChan) *Websocket {
-	return &Websocket{mdChan}
+func NewWebsocket(path string) *Websocket {
+	return &Websocket{NewWatcher(path)}
 }
 
 func (ws *Websocket) Reader(c *goWs.Conn, closed chan<- bool) {
@@ -37,12 +37,14 @@ func (ws *Websocket) Reader(c *goWs.Conn, closed chan<- bool) {
 }
 
 func (ws *Websocket) Writer(c *goWs.Conn, closed <-chan bool) {
+	ws.watcher.Start()
+	defer ws.watcher.Stop()
 	defer c.Close()
 	for {
 		select {
-		case data := <-ws.mdChan.Data:
+		case data := <-ws.watcher.C.Raw:
 			c.SetWriteDeadline(time.Now().Add(WriteTimeout))
-			err := c.WriteMessage(goWs.TextMessage, *data)
+			err := c.WriteMessage(goWs.TextMessage, MdConverter.Convert(*data))
 			if err != nil {
 				return
 			}
@@ -66,7 +68,6 @@ func (ws *Websocket) Serve(w http.ResponseWriter, r *http.Request) {
 
 	closed := make(chan bool)
 
-	ws.mdChan.Request <- true
 	go ws.Reader(sock, closed)
 	ws.Writer(sock, closed)
 }

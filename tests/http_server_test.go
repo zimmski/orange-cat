@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -13,34 +14,34 @@ import (
 
 var _ = Describe("HTTPServer", func() {
 	var (
-		port     = 6060
-		filepath = "temp_file.md"
-		template = Template(filepath, port)
-		mdChan   *MdChan
+		port       = 6060
+		serverAddr = fmt.Sprintf("http://localhost:%d", port)
 	)
-
-	BeforeEach(func() {
-		dataChan := NewDataChan()
-		mdChan = NewMdChan(dataChan, false)
-	})
 
 	Describe("#NewHTTPServer()", func() {
 		It("should return a new HTTPServer object.", func() {
-			server := NewHTTPServer(filepath, port, mdChan)
+			server := NewHTTPServer(port)
 			Expect(server).NotTo(BeNil())
+		})
+	})
+
+	Describe("#Addr()", func() {
+		It("should return a addr string.", func() {
+			server := NewHTTPServer(port)
+			Expect(server.Addr()).To(Equal(fmt.Sprintf(":%d", port)))
 		})
 	})
 
 	Describe("#httpServer.ListenAndServe()", func() {
 		It("should turn on a server.", func() {
-			server := NewHTTPServer(filepath, port, mdChan)
+			server := NewHTTPServer(port)
 			go server.ListenAndServe()
 
 			isListening := false
 			ticker := time.NewTicker(time.Millisecond * 500)
 			for i := 0; i < 10; i++ {
 				<-ticker.C
-				resp, err := http.Get("http://localhost" + server.PortStr() + "/ping")
+				resp, err := http.Get(serverAddr + "/ping")
 				if err == nil && resp.StatusCode == 200 {
 					isListening = true
 					break
@@ -56,11 +57,11 @@ var _ = Describe("HTTPServer", func() {
 
 	Describe("#httpServer.Listen()", func() {
 		It("should turn on a server and wait until it's on.", func() {
-			server := NewHTTPServer(filepath, port, mdChan)
+			server := NewHTTPServer(port)
 			server.Listen()
 
 			isListening := false
-			resp, err := http.Get("http://localhost" + server.PortStr() + "/ping")
+			resp, err := http.Get(serverAddr + "/ping")
 			if err == nil && resp.StatusCode == 200 {
 				isListening = true
 			}
@@ -71,11 +72,13 @@ var _ = Describe("HTTPServer", func() {
 		})
 
 		It("should serve the template page.", func() {
-			server := NewHTTPServer(filepath, port, mdChan)
+			readme := "README.md"
+
+			server := NewHTTPServer(port)
 			server.Listen()
 
 			isListening := false
-			resp, err := http.Get("http://localhost" + server.PortStr())
+			resp, err := http.Get(serverAddr + "/" + readme)
 			if err == nil && resp.StatusCode == 200 {
 				isListening = true
 			}
@@ -85,7 +88,7 @@ var _ = Describe("HTTPServer", func() {
 			defer resp.Body.Close()
 			content, _ := ioutil.ReadAll(resp.Body)
 			w := TestResponseWriter{}
-			template(&w)
+			Template(&w, readme, port)
 			Expect(string(content)).To(Equal(w.data))
 
 			server.Stop()
@@ -94,11 +97,11 @@ var _ = Describe("HTTPServer", func() {
 
 	Describe("#httpServer.Stop()", func() {
 		It("should stop the running server.", func() {
-			server := NewHTTPServer(filepath, port, mdChan)
+			server := NewHTTPServer(port)
 			server.Listen()
 			server.Stop()
 
-			_, err := http.Get("http://localhost" + server.PortStr() + "/ping")
+			_, err := http.Get(serverAddr + "/ping")
 
 			Expect(err).NotTo(BeNil())
 		})

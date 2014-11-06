@@ -10,30 +10,23 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"reflect"
 	"strings"
 )
 
 var _ = Describe("Template", func() {
 	Describe("#Template()", func() {
-		It("should return a template function.", func() {
-			template := Template("temp_file.md", 1234)
-			Expect(reflect.TypeOf(template).String()).
-				To(Equal("func(http.ResponseWriter)"))
-		})
-
-		It("can be used as a template function.", func() {
-			template := Template("temp_file.md", 1234)
+		It("should write the result of the template to a writer.", func() {
 			w := TestResponseWriter{}
-			template(&w)
+
+			Template(&w, "temp_file.md", 1234)
 
 			Expect(strings.Contains(w.data, "<title>temp_file.md</title>")).
 				To(Equal(true))
-			Expect(strings.Contains(w.data, "var conn = new WebSocket(\"ws://localhost:1234/ws\");")).
+			Expect(strings.Contains(w.data, "var conn = new WebSocket(\"ws://localhost:1234/temp_file.md\");")).
 				To(Equal(true))
 		})
 
-		It("uses a custom CSS if it exists.", func() {
+		It("should use a custom CSS if it exists.", func() {
 			if CustomCSSPath() == "" {
 				// If there's no custom css path, just skip this test.
 				return
@@ -41,16 +34,14 @@ var _ = Describe("Template", func() {
 
 			// Without a custom CSS
 			notExist := os.Rename(CustomCSSPath(), CustomCSSPath()+"_")
-			template := Template("temp_file.md", 1234)
 			w := TestResponseWriter{}
-			template(&w)
+			Template(&w, "temp_file.md", 1234)
 			Expect(strings.Contains(w.data, "<style>")).To(Equal(true))
 
 			// With a custom CSS
 			os.Create(CustomCSSPath())
-			template = Template("temp_file.md", 1234)
 			w = TestResponseWriter{}
-			template(&w)
+			Template(&w, "temp_file.md", 1234)
 			customCSS, _ := CustomCSS()
 			Expect(strings.Contains(w.data, *customCSS)).To(Equal(true))
 

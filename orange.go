@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/skratchdot/open-golang/open"
 )
 
@@ -8,42 +9,33 @@ const (
 	MarkdownChanSize = 3
 )
 
-func NewOrange(filepath string) *Orange {
-	return &Orange{filepath, false, make(chan chan<- bool)}
+func NewOrange(port int) *Orange {
+	return &Orange{port, nil, make(chan bool)}
 }
 
 type Orange struct {
-	filepath string
-	useBasic bool
-	stop     chan chan<- bool
+	port       int
+	httpServer *HTTPServer
+	stop       chan bool
 }
 
 func (o *Orange) UseBasic() {
-	o.useBasic = true
+	MdConverter.UseBasic()
 }
 
-func (o *Orange) Run(port int) {
-	watcher := NewWatcher(o.filepath)
-	watcher.Start()
+func (o *Orange) Run(files ...string) {
+	o.httpServer = NewHTTPServer(o.port)
+	o.httpServer.Listen()
 
-	mdChan := NewMdChan(watcher.GetDataChan(), o.useBasic)
+	for _, file := range files {
+		addr := fmt.Sprintf("http://localhost:%d/%s", o.port, file)
+		open.Run(addr)
+	}
 
-	httpServer := NewHTTPServer(o.filepath, port, mdChan)
-	httpServer.Listen()
-
-	open.Run("http://localhost" + httpServer.PortStr())
-
-	done := <-o.stop
-
-	httpServer.Stop()
-	mdChan.Stop()
-	watcher.Stop()
-
-	done <- true
+	<-o.stop
 }
 
 func (o *Orange) Stop() {
-	done := make(chan bool)
-	o.stop <- done
-	<-done
+	o.httpServer.Stop()
+	o.stop <- true
 }

@@ -39,19 +39,12 @@ var _ = Describe("Watcher", func() {
 		})
 	})
 
-	Describe("#watcher.GetDataChan()", func() {
-		It("should return a DataChan object.", func() {
-			watcher := NewWatcher(testFilepath)
-			Expect(watcher.GetDataChan()).NotTo(BeNil())
-		})
-	})
-
 	Describe("#watcher.Start()", func() {
 		It("should start watching the file modification.", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()
 
-			c := watcher.GetDataChan()
+			c := watcher.C
 			Expect(*<-c.Raw).To(Equal([]byte("Hello, world")))
 
 			watcher.Stop()
@@ -61,7 +54,7 @@ var _ = Describe("Watcher", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()
 
-			c := watcher.GetDataChan()
+			c := watcher.C
 			Expect(*<-c.Raw).To(Equal([]byte("Hello, world")))
 
 			modify(testFilepath, "Hi, there")
@@ -74,10 +67,10 @@ var _ = Describe("Watcher", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()
 
-			c := watcher.GetDataChan()
+			c := watcher.C
 			Expect(*<-c.Raw).To(Equal([]byte("Hello, world")))
 
-			c.Request <- true
+			c.Req <- true
 			Expect(*<-c.Raw).To(Equal([]byte("Hello, world")))
 
 			watcher.Stop()
@@ -89,7 +82,7 @@ var _ = Describe("Watcher", func() {
 			watcher := NewWatcher(testFilepath)
 			watcher.Start()
 
-			c := watcher.GetDataChan()
+			c := watcher.C
 			Expect(*<-c.Raw).To(Equal([]byte("Hello, world")))
 
 			watcher.Stop()

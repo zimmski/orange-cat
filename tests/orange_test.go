@@ -12,16 +12,20 @@ import (
 )
 
 var _ = Describe("Orange", func() {
+	var (
+		port = 6060
+	)
+
 	Describe("#NewOrange()", func() {
 		It("should return a new Orange object.", func() {
-			orange := NewOrange("some_file")
+			orange := NewOrange(port)
 			Expect(orange).NotTo(BeNil())
 		})
 	})
 
 	Describe("#orange.UseBasic()", func() {
 		It("should set the useBasic property.", func() {
-			orange := NewOrange("some_file")
+			orange := NewOrange(port)
 			orange.UseBasic()
 			// No way to check the property
 		})
@@ -29,8 +33,8 @@ var _ = Describe("Orange", func() {
 
 	Describe("#orange.Run()", func() {
 		It("should run a orange server listening on the given port.", func() {
-			orange := NewOrange("some_file")
-			result := runAndWait(orange, 6060)
+			orange := NewOrange(port)
+			result := runAndWait(orange, port)
 
 			Expect(result).To(Equal(true))
 
@@ -41,11 +45,10 @@ var _ = Describe("Orange", func() {
 	Describe("#orange.Stop()", func() {
 		var (
 			orange *Orange = nil
-			port           = 6060
 		)
 
 		BeforeEach(func() {
-			orange = NewOrange("some_file")
+			orange = NewOrange(port)
 			result := runAndWait(orange, port)
 			Expect(result).To(Equal(true))
 		})
@@ -69,7 +72,7 @@ var _ = Describe("Orange", func() {
 
 func runAndWait(orange *Orange, port int) bool {
 	go func() {
-		orange.Run(port)
+		orange.Run()
 	}()
 
 	// Check if we can connect to it

@@ -8,18 +8,9 @@ import (
 )
 
 var _ = Describe("Websocket", func() {
-	var (
-		mdChan *MdChan
-	)
-
-	BeforeEach(func() {
-		dataChan := NewDataChan()
-		mdChan = NewMdChan(dataChan, false)
-	})
-
 	Describe("#NewWebsocket()", func() {
 		It("should return a new Websocket object.", func() {
-			sock := NewWebsocket(mdChan)
+			sock := NewWebsocket("README.md")
 			Expect(sock).NotTo(BeNil())
 		})
 	})

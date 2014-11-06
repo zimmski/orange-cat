@@ -27,18 +27,14 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) {
 		args := c.Args()
-		if len(args) != 1 {
-			cli.ShowAppHelp(c)
-			return
-		}
 
-		orange := NewOrange(args[0])
+		orange := NewOrange(c.Int("port"))
 
 		if c.Bool("basic") {
 			orange.UseBasic()
 		}
 
-		orange.Run(c.Int("port"))
+		orange.Run(args...)
 	}
 
 	// codegangsta/cli help template

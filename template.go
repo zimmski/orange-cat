@@ -10,7 +10,7 @@ import (
 	"text/template"
 )
 
-func Template(filepath string, port int) func(http.ResponseWriter) {
+func Template(w http.ResponseWriter, filepath string, port int) {
 	var style string
 	if css, err := CustomCSS(); err == nil {
 		style = *css
@@ -31,7 +31,7 @@ func Template(filepath string, port int) func(http.ResponseWriter) {
   <script>
     (function () {
       var markdown = document.getElementById("md");
-      var conn = new WebSocket("ws://localhost:%[2]d/ws");
+      var conn = new WebSocket("ws://localhost:%[2]d/%[1]s");
       conn.onmessage = function (evt) {
         markdown.innerHTML = evt.data;
       };
@@ -39,17 +39,17 @@ func Template(filepath string, port int) func(http.ResponseWriter) {
   </script>
 </body>`, filepath, port, style)
 
-	template, err := template.New("template").Parse(templateStr)
+	var (
+		t   *template.Template
+		err error
+	)
 
-	if err != nil {
+	if t, err = template.New("template").Parse(templateStr); err != nil {
 		panic(err)
 	}
 
-	return func(w http.ResponseWriter) {
-		err := template.Execute(w, nil)
-		if err != nil {
-			panic(err)
-		}
+	if err = t.Execute(w, nil); err != nil {
+		panic(err)
 	}
 }
 

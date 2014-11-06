@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -14,33 +17,29 @@ const (
 )
 
 type HTTPServer struct {
-	filepath string
 	port     int
-	template func(http.ResponseWriter)
-	ws       *Websocket
 	listener net.Listener
 }
 
-func NewHTTPServer(filepath string, port int, mdChan *MdChan) *HTTPServer {
-	template := Template(filepath, port)
-	return &HTTPServer{filepath, port, template, NewWebsocket(mdChan), nil}
+func NewHTTPServer(port int) *HTTPServer {
+	return &HTTPServer{port, nil}
 }
 
-func (s *HTTPServer) PortStr() string {
+func (s *HTTPServer) Addr() string {
 	return ":" + strconv.Itoa(s.port)
 }
 
 func (s *HTTPServer) ListenAndServe() {
 	var err error
 	server := &http.Server{
-		Addr:           s.PortStr(),
+		Addr:           s.Addr(),
 		Handler:        s,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	s.listener, err = net.Listen("tcp", s.PortStr())
+	s.listener, err = net.Listen("tcp", s.Addr())
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +56,7 @@ func (s *HTTPServer) Listen() {
 		ticker := time.NewTicker(time.Millisecond * ListeningTestInterval)
 		for i := 0; i < MaxListeningTestCount; i++ {
 			<-ticker.C
-			resp, err := http.Get("http://localhost" + s.PortStr() + "/ping")
+			resp, err := http.Get("http://localhost" + s.Addr() + "/ping")
 			if err == nil && resp.StatusCode == 200 {
 				result = true
 				break
@@ -68,20 +67,39 @@ func (s *HTTPServer) Listen() {
 	}()
 
 	if <-isListening {
-		fmt.Println("Listening", s.PortStr(), "...")
+		fmt.Println("Listening", s.Addr(), "...")
 	} else {
 		panic("Can't connect to server")
 	}
 }
 
 func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/ping" {
+	path := r.URL.Path[1:] // remove '/'
+	if path == "ping" {
 		w.Write([]byte("pong"))
-	} else if r.URL.Path == "/ws" {
-		s.ws.Serve(w, r)
+	} else if s.IsWebsocketRequest(r) {
+		NewWebsocket(path).Serve(w, r)
 	} else {
-		s.template(w)
+		if strings.HasSuffix(path, ".md") || strings.HasSuffix(path, ".markdown") {
+			Template(w, path, s.port)
+		} else {
+			s.ServeStatic(w, path)
+		}
 	}
+}
+
+func (s *HTTPServer) ServeStatic(w http.ResponseWriter, path string) {
+	if stat, err := os.Stat(path); err == nil && stat.Mode().IsRegular() {
+		file, _ := os.Open(path)
+		io.Copy(w, file)
+	}
+}
+
+func (s *HTTPServer) IsWebsocketRequest(r *http.Request) bool {
+	upgrade := r.Header["Upgrade"]
+	connection := r.Header["Connection"]
+	return len(upgrade) > 0 && upgrade[0] == "websocket" &&
+		len(connection) > 0 && connection[0] == "Upgrade"
 }
 
 func (s *HTTPServer) Stop() {
