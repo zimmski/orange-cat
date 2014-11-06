@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/skratchdot/open-golang/open"
-	"strconv"
 )
 
 const (
@@ -24,8 +23,6 @@ func (o *Orange) UseBasic() {
 }
 
 func (o *Orange) Run(port int) {
-	portStr := ":" + strconv.Itoa(port)
-
 	watcher := NewWatcher(o.filepath)
 	watcher.Start()
 	defer watcher.Stop()
@@ -33,11 +30,11 @@ func (o *Orange) Run(port int) {
 	mdChan := NewMdChan(watcher.GetDataChan(), o.useBasic)
 	defer mdChan.Stop()
 
-	httpServer := NewHTTPServer(portStr, Template(o.filepath, port), mdChan)
+	httpServer := NewHTTPServer(o.filepath, port, mdChan)
 	httpServer.Listen()
 	defer httpServer.Stop()
 
-	open.Run("http://localhost" + portStr)
+	open.Run("http://localhost" + httpServer.PortStr())
 
 	<-o.stop
 }

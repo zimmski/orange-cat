@@ -14,8 +14,8 @@ import (
 var _ = Describe("HTTPServer", func() {
 	var (
 		port     = 6060
-		portStr  = ":6060"
-		template = Template("temp_file.md", port)
+		filepath = "temp_file.md"
+		template = Template(filepath, port)
 		mdChan   *MdChan
 	)
 
@@ -26,21 +26,21 @@ var _ = Describe("HTTPServer", func() {
 
 	Describe("#NewHTTPServer()", func() {
 		It("should return a new HTTPServer object.", func() {
-			server := NewHTTPServer(portStr, template, mdChan)
+			server := NewHTTPServer(filepath, port, mdChan)
 			Expect(server).NotTo(BeNil())
 		})
 	})
 
 	Describe("#httpServer.ListenAndServe()", func() {
 		It("should turn on a server.", func() {
-			server := NewHTTPServer(portStr, template, mdChan)
+			server := NewHTTPServer(filepath, port, mdChan)
 			go server.ListenAndServe()
 
 			isListening := false
 			ticker := time.NewTicker(time.Millisecond * 500)
 			for i := 0; i < 10; i++ {
 				<-ticker.C
-				resp, err := http.Get("http://localhost" + portStr + "/ping")
+				resp, err := http.Get("http://localhost" + server.PortStr() + "/ping")
 				if err == nil && resp.StatusCode == 200 {
 					isListening = true
 					break
@@ -56,11 +56,11 @@ var _ = Describe("HTTPServer", func() {
 
 	Describe("#httpServer.Listen()", func() {
 		It("should turn on a server and wait until it's on.", func() {
-			server := NewHTTPServer(portStr, template, mdChan)
+			server := NewHTTPServer(filepath, port, mdChan)
 			server.Listen()
 
 			isListening := false
-			resp, err := http.Get("http://localhost" + portStr + "/ping")
+			resp, err := http.Get("http://localhost" + server.PortStr() + "/ping")
 			if err == nil && resp.StatusCode == 200 {
 				isListening = true
 			}
@@ -71,11 +71,11 @@ var _ = Describe("HTTPServer", func() {
 		})
 
 		It("should serve the template page.", func() {
-			server := NewHTTPServer(portStr, template, mdChan)
+			server := NewHTTPServer(filepath, port, mdChan)
 			server.Listen()
 
 			isListening := false
-			resp, err := http.Get("http://localhost" + portStr)
+			resp, err := http.Get("http://localhost" + server.PortStr())
 			if err == nil && resp.StatusCode == 200 {
 				isListening = true
 			}
@@ -94,11 +94,11 @@ var _ = Describe("HTTPServer", func() {
 
 	Describe("#httpServer.Stop()", func() {
 		It("should stop the running server.", func() {
-			server := NewHTTPServer(portStr, template, mdChan)
+			server := NewHTTPServer(filepath, port, mdChan)
 			server.Listen()
 			server.Stop()
 
-			_, err := http.Get("http://localhost" + portStr + "/ping")
+			_, err := http.Get("http://localhost" + server.PortStr() + "/ping")
 
 			Expect(err).NotTo(BeNil())
 		})
