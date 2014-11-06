@@ -28,7 +28,7 @@ Listening :6060 ...
 
 Then `orange-cat` will start watching the Markdown file and open a
 browser window where the preview of the file will be displayed. You can
-also open `http://localhost:6060` manually.
+also open `http://localhost:6060/some_file.md` manually.
 
 When you modify the file, `orange-cat` watcher will catch the
 modification and send the modified data to the browser through a
@@ -70,9 +70,7 @@ The binary `orange` will be created at `./out/orange`.
 
 `orange-cat` will try to find a custom CSS file from
 `~/.orange-cat.css`. If there's no custom CSS file, it'll use a default
-CSS style, which shows a similar output to GitHub's one. If a custom CSS
-file is created while `orange-cat` is running, restarting `orange-cat`
-may be needed to use the custom style.
+CSS style, which shows a similar output to GitHub's one.
 
 ## Contribution
 
