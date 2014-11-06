@@ -66,6 +66,14 @@ $ make build
 
 The binary `orange` will be created at `./out/orange`.
 
+## Custom CSS
+
+`orange-cat` will try to find a custom CSS file from
+`~/.orange-cat.css`. If there's no custom CSS file, it'll use a default
+CSS style, which shows a similar output to GitHub's one. If a custom CSS
+file is created while `orange-cat` is running, restarting `orange-cat`
+may be needed to use the custom style.
+
 ## Contribution
 
 I welcome every kind of contribution.
