@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-const Version = "0.2.0-dev"
+const Version = "0.2.1"
 
 func main() {
 	app := cli.NewApp()
