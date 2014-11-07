@@ -77,7 +77,7 @@ func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path[1:] // remove '/'
 	if path == "ping" {
 		w.Write([]byte("pong"))
-	} else if s.IsWebsocketRequest(r) {
+	} else if isWebsocketRequest(r) {
 		NewWebsocket(path).Serve(w, r)
 	} else {
 		if strings.HasSuffix(path, ".md") || strings.HasSuffix(path, ".markdown") {
@@ -95,11 +95,19 @@ func (s *HTTPServer) ServeStatic(w http.ResponseWriter, path string) {
 	}
 }
 
-func (s *HTTPServer) IsWebsocketRequest(r *http.Request) bool {
+func contains(arr []string, needle string) bool {
+	for _, v := range arr {
+		if strings.Contains(v, needle) {
+			return true
+		}
+	}
+	return false
+}
+
+func isWebsocketRequest(r *http.Request) bool {
 	upgrade := r.Header["Upgrade"]
 	connection := r.Header["Connection"]
-	return len(upgrade) > 0 && upgrade[0] == "websocket" &&
-		len(connection) > 0 && connection[0] == "Upgrade"
+	return contains(upgrade, "websocket") && contains(connection, "Upgrade")
 }
 
 func (s *HTTPServer) Stop() {
