@@ -9,7 +9,7 @@ TEST_DEPS = \
 TEST_DIR = 'tests'
 XC_ARCH = "darwin/amd64 darwin/386 linux/amd64 linux/386 windows/amd64 windows/386"
 
-all: fmt test xctoolchain xc
+all: fmt test build
 
 deps:
 	@echo "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
