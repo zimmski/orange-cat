@@ -61,15 +61,16 @@ func CustomCSS() (*string, error) {
 
 	customCSSPath := filepath.Join(usr.HomeDir, ".orange-cat.css")
 
-	if stat, err := os.Stat(customCSSPath); err == nil && stat.Mode().IsRegular() {
-		customCSS := "<link rel='stylesheet' href='" + customCSSPath + "' />"
-		return &customCSS, nil
-	} else {
+	stat, err := os.Stat(customCSSPath)
+	if err != nil || !stat.Mode().IsRegular() {
 		return nil, errors.New("No custom CSS")
 	}
+
+	customCSS := "<link rel='stylesheet' href='" + customCSSPath + "' />"
+	return &customCSS, nil
 }
 
-var DefaultStyle string = `
+var DefaultStyle = `
 /* github-markdown-css */
 .markdown-body {
   overflow: hidden;

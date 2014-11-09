@@ -33,13 +33,13 @@ func (w *Watcher) Start() {
 		w.ticker = time.NewTicker(time.Millisecond * WatcherInterval)
 		defer w.ticker.Stop()
 		w.stop = make(chan bool)
-		var currentTimestamp int64 = 0
+		var currentTimestamp int64
 		for {
 			select {
 			case <-w.stop:
 				return
 			case <-w.ticker.C:
-				var reload bool = false
+				reload := false
 				select {
 				case <-w.C.Req:
 					reload = true
