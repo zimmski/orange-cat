@@ -6,7 +6,6 @@ DEPS = $(go list -f '{{range .TestImports}}{{.}} {{end}}' ./...)
 TEST_DEPS = \
 	github.com/onsi/ginkgo \
 	github.com/onsi/gomega
-TEST_DIR = 'tests'
 XC_ARCH = "darwin/amd64 darwin/386 linux/amd64 linux/386 windows/amd64 windows/386"
 
 all: fmt test build
@@ -44,8 +43,7 @@ testdeps:
 
 test: testdeps deps
 	@echo "$(OK_COLOR)==> Testing modules$(NO_COLOR)"
-	@cd $(TEST_DIR) && \
-		go test -ginkgo.v
+	@go test -ginkgo.v
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
 gox:
