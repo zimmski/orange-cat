@@ -1,4 +1,4 @@
-package main
+package orange
 
 import (
 	"github.com/russross/blackfriday"

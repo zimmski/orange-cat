@@ -1,8 +1,6 @@
-package orange_cat_test
+package orange
 
 import (
-	. "../"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

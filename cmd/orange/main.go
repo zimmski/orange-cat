@@ -1,8 +1,11 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
 	"os"
+
+	"github.com/codegangsta/cli"
+
+	"github.com/noraesae/orange-cat"
 )
 
 const Version = "0.2.1-dev"
@@ -28,7 +31,7 @@ func main() {
 	app.Action = func(c *cli.Context) {
 		args := c.Args()
 
-		orange := NewOrange(c.Int("port"))
+		orange := orange.NewOrange(c.Int("port"))
 
 		if c.Bool("basic") {
 			orange.UseBasic()
