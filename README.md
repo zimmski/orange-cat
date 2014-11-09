@@ -64,7 +64,7 @@ $ cd orange-cat
 $ make build
 ```
 
-The binary `orange` will be created at `./out/orange`.
+The binary `orange` will be created at `$GOPATH/bin/orange`.
 
 ## Custom CSS
 

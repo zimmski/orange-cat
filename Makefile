@@ -24,7 +24,7 @@ updatedeps:
 
 build: deps
 	@echo "$(OK_COLOR)==> Building orange-cat$(NO_COLOR)"
-	@go build -o out/orange
+	@go install ./...
 	@echo "$(OK_COLOR) => Done$(NO_COLOR)"
 
 fmt:
