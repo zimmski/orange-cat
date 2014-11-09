@@ -1,6 +1,8 @@
-package orange
+package orange_test
 
 import (
+	. "."
+
 	"io/ioutil"
 	"os"
 	"time"

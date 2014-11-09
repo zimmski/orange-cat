@@ -1,6 +1,8 @@
-package orange
+package orange_test
 
 import (
+	. "."
+
 	"fmt"
 	"io/ioutil"
 	"net/http"

@@ -1,4 +1,4 @@
-package orange
+package orange_test
 
 import (
 	"testing"
